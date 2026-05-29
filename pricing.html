@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treatment Price List | Dental Sphere</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .price-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 3rem;
+        }
+        .price-table th, .price-table td {
+            padding: 1.2rem 2rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .price-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+        .price-table tr:last-child td {
+            border-bottom: none;
+        }
+        .price-table tr:hover {
+            background: var(--accent);
+        }
+        .price-value {
+            font-weight: 700;
+            color: var(--primary);
+            text-align: right;
+        }
+        .category-header {
+            background: var(--bg-light);
+            padding: 1rem 2rem;
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="container nav-content">
+            <a href="index.html" class="logo-container">
+                <img src="dental sphere logo .jpeg" alt="Dental Sphere Logo">
+                <div class="logo-text">Dental Sphere</div>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Doctor</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="consultants.html">Consultants</a></li>
+                <li><a href="equipment.html">Equipment</a></li><li><a href="education.html">Education</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="contact.html" class="nav-cta">Book Appointment</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero" style="padding: 150px 0 60px; background: var(--bg-light);">
+        <div class="container">
+            <h1 data-reveal>Treatment Price List</h1>
+            <p data-reveal>Transparent pricing for high-quality dental care</p>
+        </div>
+    </header>
+
+    <section>
+        <div class="container">
+            <div data-reveal>
+                <table class="price-table">
+                    <thead>
+                        <tr>
+                            <th>Service Description</th>
+                            <th style="text-align: right;">Price (INR)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="category-header"><td colspan="2">General & Diagnostic</td></tr>
+                        <tr><td>Consultation Fee</td><td class="price-value">₹1000</td></tr>
+                        <tr><td>Digital RVG (X-Ray)</td><td class="price-value">₹1000</td></tr>
+                        <tr><td>Professional Cleaning & Polishing</td><td class="price-value">₹2000</td></tr>
+                        <tr><td>Dental Fillings (Composite)</td><td class="price-value">₹1500 / tooth</td></tr>
+                        
+                        <tr class="category-header"><td colspan="2">Root Canal Treatment (RCT)</td></tr>
+                        <tr><td>RCT - Front Teeth</td><td class="price-value">₹6500</td></tr>
+                        <tr><td>RCT - Molar Teeth</td><td class="price-value">₹8000</td></tr>
+                        
+                        <tr class="category-header"><td colspan="2">Extractions & Surgery</td></tr>
+                        <tr><td>Simple Tooth Extraction</td><td class="price-value">₹3000</td></tr>
+                        <tr><td>Impacted Third Molar (Wisdom Tooth) Surgery</td><td class="price-value">₹4000</td></tr>
+                        
+                        <tr class="category-header"><td colspan="2">Cosmetic & Aesthetics</td></tr>
+                        <tr><td>Professional Teeth Whitening</td><td class="price-value">₹10000</td></tr>
+                        <tr><td>Composite Veneers</td><td class="price-value">₹7000 / tooth</td></tr>
+                        
+                        <tr class="category-header"><td colspan="2">Orthodontics (Braces)</td></tr>
+                        <tr><td>Metal Braces</td><td class="price-value">₹45000</td></tr>
+                        <tr><td>Ceramic Braces</td><td class="price-value">₹65000</td></tr>
+                        <tr><td>Clear Aligners</td><td class="price-value">₹150000</td></tr>
+                        
+                        <tr class="category-header"><td colspan="2">Prosthetics</td></tr>
+                        <tr><td>Complete Denture (Upper/Lower)</td><td class="price-value">₹25000</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="card" style="background: var(--accent); border: 1px dashed var(--primary); text-align: center;" data-reveal>
+                <p><strong>Note:</strong> Prices are subject to change based on the complexity of the case. A final estimate will be provided after clinical examination.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="copyright">
+                &copy; 2026 Dr. Kaushik Senapati's Dental Clinic.
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>

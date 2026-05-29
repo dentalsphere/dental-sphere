@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Dental Sphere</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="admin-body">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <a href="index.html" class="admin-brand">
+            <i class="fa-solid fa-tooth" style="color: #D32F2F;"></i>
+            Dental Sphere
+        </a>
+        <div class="admin-nav">
+            <a href="admin-dashboard.html" class="admin-nav-item active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            <a href="#" class="admin-nav-item"><i class="fa-solid fa-users"></i> Patients</a>
+            <a href="#" class="admin-nav-item"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
+            <a href="#" class="admin-nav-item"><i class="fa-solid fa-wallet"></i> Revenue</a>
+            <a href="#" class="admin-nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        
+        <!-- Header -->
+        <header class="admin-header">
+            <div>
+                <span style="color: #64748B; font-size: 0.9rem;">Overview / Dashboard</span>
+            </div>
+            <div class="header-user">
+                <div style="width: 35px; height: 35px; background: #D32F2F; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                    DK
+                </div>
+                <span>Dr. Kaushik</span>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="admin-content">
+            <h1 class="page-title">Dashboard Overview</h1>
+
+            <!-- KPIs -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon icon-blue"><i class="fa-solid fa-users"></i></div>
+                    <div class="kpi-details">
+                        <h3>Total Patients</h3>
+                        <p>10,245</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon icon-green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                    <div class="kpi-details">
+                        <h3>Monthly Revenue</h3>
+                        <p>₹4.2L</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon icon-purple"><i class="fa-solid fa-calendar-day"></i></div>
+                    <div class="kpi-details">
+                        <h3>Today's Appts</h3>
+                        <p>18</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon icon-red"><i class="fa-solid fa-heart-pulse"></i></div>
+                    <div class="kpi-details">
+                        <h3>New Patients (M)</h3>
+                        <p>142</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                
+                <!-- Revenue Chart -->
+                <div class="panel">
+                    <h2 class="panel-title">Revenue Analytics (Last 6 Months)</h2>
+                    <canvas id="revenueChart" height="120"></canvas>
+                </div>
+
+                <!-- Appointments -->
+                <div class="panel">
+                    <h2 class="panel-title">Appointments</h2>
+                    <div style="overflow-x: auto;">
+                        <table id="appointmentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Patient Name</th>
+                                    <th>Phone</th>
+                                    <th>Message</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Appointments will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Chart Logic -->
+    <script>
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Revenue (₹)',
+                    data: [350000, 380000, 310000, 420000, 400000, 450000],
+                    backgroundColor: '#D32F2F',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f1f5f9'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Appointments Logic
+        async function fetchAppointments() {
+            try {
+                const response = await fetch('/api/appointments');
+                const appointments = await response.json();
+                const tbody = document.querySelector('#appointmentsTable tbody');
+                tbody.innerHTML = '';
+                
+                appointments.forEach(app => {
+                    const row = document.createElement('tr');
+                    const date = new Date(app.createdAt).toLocaleDateString();
+                    
+                    row.innerHTML = `
+                        <td>${app.name}</td>
+                        <td>${app.phone}</td>
+                        <td>${app.message || '-'}</td>
+                        <td>${date}</td>
+                        <td><span class="status ${app.status.toLowerCase()}">${app.status}</span></td>
+                        <td>
+                            <select onchange="updateStatus('${app._id}', this.value)" class="status-select">
+                                <option value="Pending" ${app.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Confirmed" ${app.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                                <option value="Completed" ${app.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            </select>
+                            <button onclick="deleteAppointment('${app._id}')" class="btn-delete"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                // Update Today's Appts KPI (for demo just total count)
+                const todaysApptsKPI = document.querySelectorAll('.kpi-details p')[2];
+                if(todaysApptsKPI) todaysApptsKPI.innerText = appointments.length;
+
+            } catch(e) {
+                console.error("Error fetching appointments:", e);
+            }
+        }
+
+        async function updateStatus(id, newStatus) {
+            try {
+                await fetch(`/api/appointments/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                fetchAppointments();
+            } catch(e) { console.error(e); }
+        }
+
+        async function deleteAppointment(id) {
+            if(!confirm("Are you sure you want to delete this appointment?")) return;
+            try {
+                await fetch(`/api/appointments/${id}`, {
+                    method: 'DELETE'
+                });
+                fetchAppointments();
+            } catch(e) { console.error(e); }
+        }
+
+        // Fetch on load and every 30s
+        fetchAppointments();
+        setInterval(fetchAppointments, 30000);
+    </script>
+</body>
+</html>

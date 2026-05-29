@@ -2,11 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs').promises;
+const { kv } = require('@vercel/kv'); // Import Vercel KV
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, 'appointments.json');
 
 // Middleware
 app.use(cors());
@@ -14,20 +13,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
-// Helper: Read Data
+// Helper: Read Data from Vercel KV
 async function readData() {
   try {
-    const data = await fs.readFile(DATA_FILE, 'utf8');
-    return JSON.parse(data);
+    const data = await kv.get('appointments');
+    return data || [];
   } catch (err) {
-    if (err.code === 'ENOENT') return [];
-    throw err;
+    console.error('KV Read Error:', err);
+    return [];
   }
 }
 
-// Helper: Write Data
+// Helper: Write Data to Vercel KV
 async function writeData(data) {
-  await fs.writeFile(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
+  try {
+    await kv.set('appointments', data);
+  } catch (err) {
+    console.error('KV Write Error:', err);
+    throw err;
+  }
 }
 
 // --- API Routes ---
@@ -104,6 +108,12 @@ app.get('/:page', (req, res, next) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Export the Express app for Vercel Serverless Functions
+module.exports = app;
+
+// Keep listen for local development
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}

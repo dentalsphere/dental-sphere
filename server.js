@@ -30,7 +30,7 @@ const Appointment = require('./models/Appointment');
 // --- API Routes ---
 
 // Get all appointments (most recent first)
-app.get('/api/appointments', async (req, res) => {
+app.get('/appointments', async (req, res) => {
   try {
     const appointments = await Appointment.find().sort({ createdAt: -1 }).lean();
     res.json(appointments);
@@ -40,7 +40,7 @@ app.get('/api/appointments', async (req, res) => {
 });
 
 // Create new appointment
-app.post('/api/appointments', async (req, res) => {
+app.post('/appointments', async (req, res) => {
   try {
     const newAppointment = await Appointment.create({
       name: req.body.name,
@@ -55,7 +55,7 @@ app.post('/api/appointments', async (req, res) => {
 });
 
 // Update appointment status
-app.patch('/api/appointments/:id', async (req, res) => {
+app.patch('/appointments/:id', async (req, res) => {
   try {
     const { status } = req.body;
     const updated = await Appointment.findByIdAndUpdate(
@@ -71,7 +71,7 @@ app.patch('/api/appointments/:id', async (req, res) => {
 });
 
 // Delete appointment
-app.delete('/api/appointments/:id', async (req, res) => {
+app.delete('/appointments/:id', async (req, res) => {
   try {
     await Appointment.findByIdAndDelete(req.params.id);
     res.json({ message: 'Appointment deleted successfully' });

@@ -55,9 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. WhatsApp Floating Button
+    // 5. Floating Action Buttons
+    const callBtn = document.createElement('a');
+    callBtn.href = 'tel:+919901994170';
+    callBtn.className = 'call-float';
+    callBtn.innerHTML = '<i class="fa-solid fa-phone"></i>';
+    document.body.appendChild(callBtn);
+
     const waBtn = document.createElement('a');
-    waBtn.href = 'https://wa.me/91XXXXXXXXXX'; // Placeholder for doctor's WhatsApp
+    waBtn.href = 'https://wa.me/919901994170';
     waBtn.className = 'whatsapp-float';
     waBtn.target = '_blank';
     waBtn.innerHTML = '<i class="fa-brands fa-whatsapp"></i>';

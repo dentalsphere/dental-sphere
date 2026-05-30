@@ -4,7 +4,8 @@
   "description": "Backend for Dental Sphere",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "echo 'Building...'"
   },
   "dependencies": {
     "@vercel/kv": "^3.0.0",

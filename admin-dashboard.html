@@ -11,6 +11,17 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="admin-body">
+    <script>
+        // Check authentication
+        if (sessionStorage.getItem('isStaff') !== 'true') {
+            window.location.href = 'login.html';
+        }
+        
+        function logout() {
+            sessionStorage.removeItem('isStaff');
+            window.location.href = 'login.html';
+        }
+    </script>
 
     <!-- Sidebar -->
     <aside class="admin-sidebar">
@@ -24,6 +35,7 @@
             <a href="#" class="admin-nav-item"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
             <a href="#" class="admin-nav-item"><i class="fa-solid fa-wallet"></i> Revenue</a>
             <a href="#" class="admin-nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+            <a href="#" onclick="logout()" class="admin-nav-item" style="margin-top: auto; color: var(--primary);"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
         </div>
     </aside>
 

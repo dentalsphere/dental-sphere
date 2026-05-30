@@ -195,7 +195,7 @@ nav.scrolled {
 /* --- Hero Section --- */
 .hero {
   padding: 220px 0 140px;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 100%), url('https://onedentalsphere.netlify.app/hero%20section%20image.png') no-repeat center center;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 100%), url('hero%20section%20image.png') no-repeat center center;
   background-size: cover;
   position: relative;
   overflow: hidden;
@@ -402,7 +402,7 @@ footer {
 @media (max-width: 992px) {
   .hero {
     padding: 180px 0 100px;
-    background: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url('https://onedentalsphere.netlify.app/hero%20section%20image.png') no-repeat center center;
+    background: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url('hero%20section%20image.png') no-repeat center center;
     background-size: cover;
   }
   .hero-content {

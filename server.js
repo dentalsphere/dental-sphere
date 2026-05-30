@@ -1,8 +1,8 @@
+// server.js - Express backend with MongoDB (Mongoose)
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { kv } = require('@vercel/kv'); // Import Vercel KV
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,35 +13,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
-// Helper: Read Data from Vercel KV
-async function readData() {
-  try {
-    const data = await kv.get('appointments');
-    return data || [];
-  } catch (err) {
-    console.error('KV Read Error:', err);
-    return [];
-  }
-}
+// Database connection
+const mongoose = require('mongoose');
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
-// Helper: Write Data to Vercel KV
-async function writeData(data) {
-  try {
-    await kv.set('appointments', data);
-  } catch (err) {
-    console.error('KV Write Error:', err);
-    throw err;
-  }
-}
+// Appointment model
+const Appointment = require('./models/Appointment');
 
 // --- API Routes ---
 
-// Get all appointments
+// Get all appointments (most recent first)
 app.get('/api/appointments', async (req, res) => {
   try {
-    const appointments = await readData();
-    // Sort by createdAt descending
-    appointments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const appointments = await Appointment.find().sort({ createdAt: -1 }).lean();
     res.json(appointments);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -51,17 +40,12 @@ app.get('/api/appointments', async (req, res) => {
 // Create new appointment
 app.post('/api/appointments', async (req, res) => {
   try {
-    const appointments = await readData();
-    const newAppointment = {
-      _id: Date.now().toString(),
+    const newAppointment = await Appointment.create({
       name: req.body.name,
       phone: req.body.phone,
       message: req.body.message || '',
       status: 'Pending',
-      createdAt: new Date().toISOString()
-    };
-    appointments.push(newAppointment);
-    await writeData(appointments);
+    });
     res.status(201).json(newAppointment);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -72,13 +56,13 @@ app.post('/api/appointments', async (req, res) => {
 app.patch('/api/appointments/:id', async (req, res) => {
   try {
     const { status } = req.body;
-    const appointments = await readData();
-    const index = appointments.findIndex(app => app._id === req.params.id);
-    if (index === -1) return res.status(404).json({ error: 'Not found' });
-    
-    appointments[index].status = status;
-    await writeData(appointments);
-    res.json(appointments[index]);
+    const updated = await Appointment.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: 'Not found' });
+    res.json(updated);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -87,9 +71,7 @@ app.patch('/api/appointments/:id', async (req, res) => {
 // Delete appointment
 app.delete('/api/appointments/:id', async (req, res) => {
   try {
-    let appointments = await readData();
-    appointments = appointments.filter(app => app._id !== req.params.id);
-    await writeData(appointments);
+    await Appointment.findByIdAndDelete(req.params.id);
     res.json({ message: 'Appointment deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -100,7 +82,7 @@ app.delete('/api/appointments/:id', async (req, res) => {
 app.get('/:page', (req, res, next) => {
   const page = req.params.page;
   if (!page.includes('.')) {
-    res.sendFile(path.join(__dirname, `${page}.html`), (err) => {
+    res.sendFile(path.join(__dirname, `${page}.html`), err => {
       if (err) next();
     });
   } else {
@@ -108,10 +90,10 @@ app.get('/:page', (req, res, next) => {
   }
 });
 
-// Export the Express app for Vercel Serverless Functions
+// Export the Express app (for Netlify/Vercel functions)
 module.exports = app;
 
-// Keep listen for local development
+// Local development server
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

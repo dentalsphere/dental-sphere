@@ -13,12 +13,14 @@
 <body class="admin-body">
     <script>
         // Check authentication
-        if (sessionStorage.getItem('isStaff') !== 'true') {
+        const token = sessionStorage.getItem('jwtToken');
+        if (!token) {
             window.location.href = 'login.html';
         }
         
         function logout() {
             sessionStorage.removeItem('isStaff');
+            sessionStorage.removeItem('jwtToken');
             window.location.href = 'login.html';
         }
     </script>
@@ -166,7 +168,15 @@
         // Appointments Logic
         async function fetchAppointments() {
             try {
-                const response = await fetch('/api/appointments');
+                const response = await fetch('/api/appointments', {
+                    headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwtToken') }
+                });
+                
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
+                
                 const appointments = await response.json();
                 const tbody = document.querySelector('#appointmentsTable tbody');
                 tbody.innerHTML = '';
@@ -204,11 +214,15 @@
 
         async function updateStatus(id, newStatus) {
             try {
-                await fetch(`/api/appointments/${id}`, {
+                const response = await fetch(`/api/appointments/${id}`, {
                     method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + sessionStorage.getItem('jwtToken')
+                    },
                     body: JSON.stringify({ status: newStatus })
                 });
+                if (response.status === 401 || response.status === 403) return logout();
                 fetchAppointments();
             } catch(e) { console.error(e); }
         }
@@ -216,9 +230,11 @@
         async function deleteAppointment(id) {
             if(!confirm("Are you sure you want to delete this appointment?")) return;
             try {
-                await fetch(`/api/appointments/${id}`, {
-                    method: 'DELETE'
+                const response = await fetch(`/api/appointments/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwtToken') }
                 });
+                if (response.status === 401 || response.status === 403) return logout();
                 fetchAppointments();
             } catch(e) { console.error(e); }
         }

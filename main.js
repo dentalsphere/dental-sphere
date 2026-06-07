@@ -82,6 +82,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(contactForm);
             const data = Object.fromEntries(formData.entries());
 
+            // Client-side validation
+            if (!data.name || data.name.trim().length < 2) {
+                alert('Please enter a valid name (at least 2 characters).');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                return;
+            }
+            if (!data.phone || data.phone.trim().length < 7) {
+                alert('Please enter a valid phone number.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                return;
+            }
+
             try {
                 const response = await fetch('/api/appointments', {
                     method: 'POST',
@@ -93,16 +107,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response.ok) {
                     btn.innerHTML = 'Appointment Requested!';
-                    btn.style.background = '#4CAF50';
+                    btn.style.background = '#4CAF5A';
                     contactForm.reset();
+                    alert('Thank you! Your appointment request has been sent successfully. We will contact you shortly.');
                 } else {
-                    btn.innerHTML = 'Failed to Send';
+                    let errorMsg = 'Failed to Send';
+                    try {
+                        const errorData = await response.json();
+                        if (errorData.error) errorMsg = errorData.error;
+                    } catch (e) {
+                        // ignore JSON parse error
+                    }
+                    console.error('Appointment request failed:', response.status, errorMsg);
+                    btn.innerHTML = 'Failed';
                     btn.style.background = '#D32F2F';
+                    alert('Error: ' + errorMsg);
                 }
             } catch (err) {
                 console.error(err);
                 btn.innerHTML = 'Network Error';
                 btn.style.background = '#D32F2F';
+                alert('Network Error. Please check your connection and try again.');
             }
 
             setTimeout(() => {

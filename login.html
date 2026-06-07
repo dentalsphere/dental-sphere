@@ -109,17 +109,40 @@
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
+            const btn = this.querySelector('button');
+            const originalText = btn.innerHTML;
             
-            // Simple credential check (In a real app, this should be done via backend)
-            if((user === 'admin' && pass === 'admin') || (user === 'drkaushik' && pass === 'sphere123')) {
-                sessionStorage.setItem('isStaff', 'true');
-                window.location.href = 'admin-dashboard.html';
-            } else {
+            btn.innerHTML = 'Verifying...';
+            btn.disabled = true;
+            document.getElementById('error-msg').style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+
+                if(response.ok) {
+                    const data = await response.json();
+                    sessionStorage.setItem('jwtToken', data.token);
+                    sessionStorage.setItem('isStaff', 'true');
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    document.getElementById('error-msg').style.display = 'block';
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('error-msg').innerText = 'Network error. Try again.';
                 document.getElementById('error-msg').style.display = 'block';
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         });
     </script>
